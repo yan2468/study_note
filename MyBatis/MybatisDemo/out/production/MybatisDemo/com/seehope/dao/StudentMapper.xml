@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--映射文件   拿来放SQL语句的-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seehope.dao.IStudentDao">
+    <!-- namespace为接口的路径   id为接口下的方法  resultType是实体类的路径 -->
+    <select id="findAllStudents" resultType="com.seehope.entity.Student">
+        select id as sid,
+               studentname as sname,
+               gender as sex,
+               age from student
+    </select>
+    <select id="findStudentById" resultType="com.seehope.entity.Student" parameterType="int">
+        select id as sid,
+               studentname as sname,
+               gender as sex,
+               age from student where id=#{sid}
+    </select>
+
+
+
+</mapper>
