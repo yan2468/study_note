@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seehope.dao.DeptDao">
+    <resultMap id="deptResultMap" type="Dept">
+        <id property="deptno" column="deptno" />
+        <result property="dname" column="dname" />
+        <result property="loc" column="loc" />
+        <!-- 关联属性的映射关系 -->
+        <collection property="emp" ofType="Emp" >
+            <id property="eno" column="empno" />
+            <result property="name" column="ename" />
+            <result property="ejob" column="job" />
+            <result property="emgr" column="mgr" />
+            <result property="edate" column="hiredate" />
+            <result property="esal" column="sal" />
+            <result property="ecomm" column="comm" />
+            <result property="deno" column="deptno" />
+        </collection>
+    </resultMap>
+    <!-- 多表连接查询 -->
+    <select id="findDeptByNo" parameterType="int" resultMap="deptResultMap">
+        SELECT dept.*,emp.* FROM dept, emp WHERE dept.deptno = emp.deptno AND dept.deptno=#{deptno}
+    </select>
+
+
+</mapper>

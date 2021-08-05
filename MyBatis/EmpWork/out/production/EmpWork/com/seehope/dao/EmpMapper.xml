@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seehope.dao.EmpDao">
+<!--    <select id="selectBlog" resultType="Blog">-->
+<!--        select * from Blog where id = #{id}-->
+<!--    </select>-->
+
+    <resultMap type="Emp" id="EmpMap" >
+        <id property="eno" column="empno" />
+        <result property="name" column="ename"/>
+        <result property="ejob" column="job"/>
+        <result property="emgr" column="mgr"/>
+        <result property="edate" column="hiredate"/>
+        <result property="esal" column="sal"/>
+        <result property="ecomm" column="comm"/>
+        <result property="deno" column="deptno"/>
+    </resultMap>
+
+    <select id="fillAllEmp" resultMap="EmpMap">
+        select * from emp
+    </select>
+
+
+    <select id="findEmpByEmpno" resultMap="EmpMap" parameterType="Emp">
+        select * from emp where empno=#{eno}
+    </select>
+
+    <insert id="insertEmp" parameterType="Emp">
+        insert into emp values(#{eno},#{name},#{ejob},#{emgr},#{edate},#{esal},#{ecomm},#{deno})
+    </insert>
+
+    <update id="updateEmp" parameterType="Emp">
+        update emp set ename=#{name},job=#{ejob},mgr=#{emgr},hiredate= #{edate},sal=#{esal},comm=#{ecomm},deptno=#{deno} where empno=#{eno};
+    </update>
+
+    <delete id="deleteEmp" parameterType="int">
+        delete from emp where empno=#{eno};
+    </delete>
+
+    <select id="findEmpByDeptno" resultMap="EmpMap" parameterType="Emp" >
+         select * from emp where deptno=#{param1} and job=#{param2}
+    </select>
+
+
+    <select id="findEmpByDeptno2" resultMap="EmpMap" parameterType="Emp">
+        select * from emp where deptno=#{deno} and job=#{ejob}
+    </select>
+    <select id="findEmpByDeptno3" resultMap="EmpMap" parameterType="hashmap">
+        select * from emp where deptno=#{deno} and job=#{ejob}
+    </select>
+
+
+<!--    另-->
+    <resultMap id="EmpMapper" type="Emp">
+        <id property="eno" column="empno" />
+        <result property="name" column="ename"/>
+        <result property="ejob" column="job"/>
+        <result property="emgr" column="mgr"/>
+        <result property="edate" column="hiredate"/>
+        <result property="esal" column="sal"/>
+        <result property="ecomm" column="comm"/>
+        <result property="deno" column="deptno"/>
+        <!-- 关联属性 -->
+        <association property="dept" javaType="Dept">
+            <id property="deptno" column="deptno" />
+            <result property="dname" column="dname" />
+            <result property="loc" column="loc" />
+        </association>
+    </resultMap>
+    <!-- 多表连接查询 -->
+    <select id="searchEmpById" parameterType="int" resultMap="EmpMapper">
+        SELECT dept.*,emp.* FROM dept, emp WHERE dept.deptno = emp.deptno AND emp.empno=#{id};
+    </select>
+
+
+
+</mapper>
