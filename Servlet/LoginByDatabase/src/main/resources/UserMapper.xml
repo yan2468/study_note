@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seehope.dao.UserDao">
+    <resultMap type="User" id="UserMap" >
+        <id property="userID" column="userID" />
+        <result property="userName" column="userName"/>
+        <result property="userPassword" column="userPassword"/>
+        <result property="sex" column="sex"/>
+        <result property="school" column="school"/>
+        <result property="hobby" column="hobby"/>
+        <result property="birthday" column="birthday"/>
+        <result property="phoneNumber" column="phoneNumber"/>
+    </resultMap>
+    <!-- 多表连接查询 -->
+    <select id="selectOne" resultMap="UserMap" parameterType="User" >
+        select * from user where userName=#{param1} and userPassword=#{param2}
+    </select>
+
+<!--    keyProperty 和 useGeneratedKeys是因为想不让用户看到用户编号其编号自增长-->
+    <insert id="insertUser" parameterType="User" keyProperty="userID" useGeneratedKeys="true">
+        insert into user(userName,userPassword,sex,school,hobby,birthday,phoneNumber) values(#{userName},#{userPassword},#{sex},#{school},#{hobby},#{birthday},#{phoneNumber})
+    </insert>
+
+    <select id="findUserByUserName" resultMap="UserMap" parameterType="User">
+        select * from user where userName=#{userName}
+    </select>
+
+</mapper>
