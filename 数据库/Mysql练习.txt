@@ -1,0 +1,186 @@
+-------------------------------- 作业一 -------------------------------------------------------------------------
+-------------------------------- 作业一 -------------------------------------------------------------------------
+1.查询员工姓名是4个字母的员工信息
+SELECT * FROM emp WHERE ename LIKE '____';
+
+2.查询员工姓名里面包含A的
+SELECT * FROM emp WHERE ename LIKE '%A%';
+
+3.查询员工姓名以S结尾的
+SELECT * FROM emp WHERE ename LIKE '%S';
+
+
+4.分组查询各个职位的员工人数,输出职位与员工人数
+SELECT job AS 职位,COUNT(ename) AS 员工人数 FROM emp GROUP BY job;
+
+5.分组查询各个职位的员工平均工资,最高工资,最低工资
+SELECT job,AVG(sal),MAX(sal),MIN(sal) FROM emp GROUP BY job;
+
+6.分组查询各个职位的员工平均实发工资(工资+奖金),输出职位与员工平均工实发工资,用中文显示列名,只显示平均实发工资大于2000的
+SELECT job,AVG(IFNULL(sal,0)+IFNULL(comm,0)) AS 实发工资 FROM emp GROUP BY job HAVING AVG(IFNULL(sal,0)+IFNULL(comm,0)) >2000;
+
+-------------------------------- 作业二-------------------------------------------------------------------------
+
+-------------------------------- 作业二-------------------------------------------------------------------------
+-- 1.查询某个部门名称的部门经理,输出经理的全部信息
+SELECT mgr 经理 FROM emp WHERE deptno=20;   	-- 子数组
+SELECT * FROM emp WHERE empno IN(SELECT mgr 经理 FROM emp WHERE deptno=20);   	
+
+-- 2.查询某个专业的某门课程的总分,平均分 studentinfo、course、scores
+SELECT studentno FROM studentinfo WHERE speciality='计算机软件'; -- 某专业
+SELECT SUM(score) 总分,AVG(score) 平均分 FROM scores WHERE studentno IN(SELECT studentno FROM studentinfo WHERE speciality='计算机软件')&&courseno=1;
+
+-- 3.查询张无忌同学的总分与平均分
+SELECT studentno FROM studentinfo WHERE studentname='张无忌'; -- 输出学号
+SELECT SUM(score) 总分,AVG(score) 平均分 FROM scores WHERE studentno IN(SELECT studentno FROM studentinfo WHERE studentname='张无忌');-- 根据学号在scores中匹配
+
+-- 4.查询同学姓名，总分与平均分
+SELECT studentno,studentname FROM studentinfo ;-- 输出所有同学的学号
+SELECT studentno,SUM(score) 总分 ,AVG(score) 平均分 FROM scores GROUP BY studentno;-- 分数
+SELECT studentname,b.* FROM studentinfo AS a,(SELECT studentno,SUM(score) 总分 ,AVG(score) 平均分 FROM scores GROUP BY studentno) AS b WHERE a.studentno=b.studentno;-- 2套1，输出名字
+
+-- 5.查询男女学生的总分与平均分  分别算再加起来
+SELECT a.studentsex ,SUM(sum1) 总分,AVG(avg1) 平均分 FROM studentinfo AS a,(SELECT studentno,SUM(score) AS sum1 ,AVG(score) AS avg1 FROM scores GROUP BY studentno) AS b WHERE a.studentno=b.studentno&&studentsex='男'
+UNION ALL
+SELECT a.studentsex ,SUM(sum1) 总分,AVG(avg1) 平均分 FROM studentinfo AS a,(SELECT studentno,SUM(score) AS sum1 ,AVG(score) AS avg1 FROM scores GROUP BY studentno) AS b WHERE a.studentno=b.studentno&&studentsex='女';
+ 
+-- 6.查询201701班的同学的成绩记录.
+SELECT studentno FROM studentinfo WHERE class=201701; -- 输出学号
+SELECT * FROM scores WHERE studentno IN(SELECT studentno FROM studentinfo WHERE class=201701);
+
+-- 7.查询计算机软件专业的男同学的总分与平均分
+SELECT studentno FROM studentinfo WHERE speciality='计算机软件'; -- 输出学号
+SELECT b.* FROM (SELECT studentno FROM studentinfo WHERE speciality='计算机软件') AS a,(SELECT studentno,SUM(score) AS 总分 ,AVG(score) AS 平均分 FROM scores GROUP BY studentno) AS b WHERE a.studentno=b.studentno;
+
+-- 8.查询java课程的成绩记录
+SELECT courseno FROM course WHERE coursename='java基础';-- 课程编号
+SELECT * FROM scores WHERE courseno=(SELECT courseno FROM course WHERE coursename='java基础');
+
+-- 9.查询姓张的学生的学生姓名,课程名称,成绩.
+SELECT * FROM studentinfo WHERE studentname LIKE '张%'; -- 输出学号
+SELECT b.* FROM (SELECT studentno FROM studentinfo WHERE studentname LIKE '张%') AS a,(SELECT studentno,SUM(score) AS 总分 ,AVG(score) AS 平均分 FROM scores GROUP BY studentno) AS b WHERE a.studentno=b.studentno;
+
+-- 10.查询成绩及格的学生编号,姓名,课程编号,课程名称,成绩
+SELECT * FROM scores WHERE score>=60;-- 获取及格人的学号
+SELECT * FROM course ;-- 获取所有的课程编号，课程名称
+SELECT a.studentno ,b.studentname ，a.coureno,a.score FROM scores AS a,(SELECT * FROM studentinfo)AS b WHERE a.score>=60;
+SELECT b.studentno 学生编号,a.courseno 课程编号 ,b.studentname 姓名,a.coursename 课程名称,b.score 成绩 FROM course AS a,(SELECT a.studentno ,b.studentname ,a.courseno AS courseno,a.score FROM scores AS a,(SELECT * FROM studentinfo)AS b WHERE a.score>=60) AS b WHERE a.courseno=b.courseno;
+
+-- 11.查询各门课程最高分的同学的信息，及课程名称，成绩
+SELECT coursename FROM course;
+SELECT * FROM course;
+
+SELECT courseno,MAX(score) m FROM scores GROUP BY courseno; -- 各门成绩的最高分
+SELECT  b.* FROM (SELECT courseno,MAX(score) m FROM scores GROUP BY courseno) t ,scores b WHERE b.courseno=t.courseno AND t.m=b.score;-- 各门成绩的最高分 对应的学号
+SELECT b.coursename,a.* FROM (SELECT  b.* FROM (SELECT courseno,MAX(score) m FROM scores GROUP BY courseno) t ,scores b WHERE b.courseno=t.courseno AND t.m=b.score) AS a,course AS b WHERE a.courseno=b.courseno; -- 最高分、课程名称，成绩、对应的学号
+
+SELECT b.*,a.* FROM studentinfo AS a ,
+(SELECT b.coursename,a.* FROM (SELECT  b.* FROM (SELECT courseno,MAX(score) m FROM scores GROUP BY courseno) t ,scores b WHERE b.courseno=t.courseno AND t.m=b.score) AS a,course AS b WHERE a.courseno=b.courseno) AS b
+ WHERE a.studentno=b.studentno;  -- 根据学号 找对应的学生信息
+
+-- 12. 创建一个工资等级表，等级变p1-p5,工资范围自定。查询各个员工的工资等级。
+CREATE TABLE emplev(
+	id INT,
+	nlevel VARCHAR(10),
+	srange DOUBLE ,
+	lrange DOUBLE 
+);
+SELECT * FROM emplev;
+SELECT ename,sal+IFNULL(comm,0) AS salary FROM emp ;
+SELECT * FROM emplev AS a ,(SELECT ename,sal+IFNULL(comm,0) AS salary FROM emp )AS b WHERE b.salary BETWEEN a.srange AND a.lrange ; -- 在区间内匹配
+
+-------------------------------- 作业三 ------------------------------------------------------------------------
+
+-------------------------------- 作业三 ------------------------------------------------------------------------
+
+-- 1.查询各个学生的学号，姓名，出生日期，年龄，平均成绩（students数据库）
+SELECT studentno,studentname,birthday,YEAR(NOW())-YEAR(birthday) age FROM studentinfo; -- 各个学生的学号，姓名，出生日期，年龄
+SELECT studentno,AVG(score) FROM scores GROUP BY studentno; -- 平均成绩
+
+SELECT a.*,b.平均成绩 FROM (SELECT studentno,studentname,birthday,YEAR(NOW())-YEAR(birthday) age FROM studentinfo)AS a,(SELECT studentno,AVG(score) 平均成绩 FROM scores GROUP BY studentno) AS b WHERE a.studentno=b.studentno;
+
+
+-- 2.查询工龄大于8的员工信息
+SELECT * ,YEAR(NOW())-YEAR(hiredate)  FROM emp ; -- 获取全部工龄
+SELECT * ,YEAR(NOW())-YEAR(hiredate) 工龄 FROM emp WHERE YEAR(NOW())-YEAR(hiredate)>8; -- 工龄大于8的员工
+
+
+-- 视图作业:
+-- 1.创建视图,查询学号为20170101的学生的姓名,课程名称,成绩
+
+SELECT * FROM scores; -- 成绩score
+SELECT * FROM course; -- 课程名称coursename
+SELECT a.studentno,a.score,b.coursename FROM scores a,course b WHERE a.courseno=b.courseno&&a.studentno=20170101; -- 学号为20170101的学生的课程名称,成绩
+CREATE VIEW v_kefen
+AS 
+SELECT a.studentno,a.score,b.coursename FROM scores a,course b WHERE a.courseno=b.courseno&&a.studentno=20170101; -- 装进视图
+
+SELECT * FROM v_kefen; -- 查看视图
+SELECT a.studentname,b.* FROM studentinfo AS a,v_kefen AS b WHERE a.studentno=b.studentno; -- 和studentinfo表做联合查询 得出结果
+
+CREATE VIEW v_stumess
+AS 
+SELECT a.studentname,b.* FROM studentinfo AS a,v_kefen AS b WHERE a.studentno=b.studentno; -- 将结果装进另一个视图
+
+
+-- 2.查询上述视图,输出该学生的姓名,总成绩与平均成绩
+SELECT studentname,SUM(score),AVG(score) FROM v_stumess;
+
+
+-- 存储过程:
+-- 1.查询某个学号的学生的总成绩与平均成绩
+SELECT * FROM studentinfo;
+SELECT * FROM scores;
+
+DELIMITER $$
+CREATE PROCEDURE sp_t1(IN stuno INT) 
+BEGIN
+	SELECT * FROM scores WHERE studentno=stuno;
+END
+$$
+DELIMITER;
+CALL sp_t1(20170101);-- 输入学号获取
+
+
+
+-- 2.查询某门课程编号的总成绩与平均成绩
+SELECT * FROM scores;
+
+DELIMITER $$
+CREATE PROCEDURE sp_t2(IN couno INT)
+BEGIN
+	SELECT SUM(score),AVG(score) FROM scores WHERE courseno=couno;
+END
+$$
+DELIMITER;
+CALL sp_t2(1);-- 输入课程号获取
+
+
+-- 3.查询某个部门名称的部门经理,输出经理的全部信息
+SELECT * FROM emp;
+
+DELIMITER $$
+CREATE PROCEDURE sp_t3(IN deno INT)
+BEGIN
+	
+	SELECT * FROM emp WHERE empno IN(SELECT mgr 经理 FROM emp WHERE deptno=deno);   	
+
+END
+$$
+DELIMITER;
+CALL sp_t3(20); -- 输入部门号获取对应经理员工编号相关信息
+
+
+-- 4.查询某个专业的某门课程的总分,平均分
+SELECT * FROM scores;
+SELECT * FROM studentinfo;
+SELECT * FROM course;
+
+DELIMITER $$
+CREATE PROCEDURE sp_t4(IN str1 VARCHAR(50),IN num2 INT) -- num2专业 num1课程
+BEGIN
+	SELECT SUM(score) 总分 ,AVG(score) 平均分  FROM scores WHERE studentno IN (SELECT studentno FROM studentinfo WHERE speciality=str1) && courseno=num2;
+END
+$$
+DELIMITER;
+CALL sp_t4('计算机软件',1);
