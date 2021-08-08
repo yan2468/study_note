@@ -1,0 +1,38 @@
+
+
+1.创建注册页面
+表单项有：
+用户编号，用户名，密码，性别（单选），学校（下拉框，清华，北大，复旦，交大，中科大），专长（多选），出生年月（yyyy-MM-dd)，电话号码
+action="register2"
+
+2.创建com.seehope.entity包，包下创建User类，封装上述信息。
+
+3.创建com.seehope.dao包，包下创建UserDao类，参考代码如下：
+public class UserDao {
+private static Map<String, User> users= new HashMap<String, User>();	
+	
+	//得到所有用户
+	public static Map<String, User> findAllUsers(){
+		return users;
+	}
+	
+	//添加用户
+	public static void insertUser(User user){
+		users.put(user.getId(),user);
+	}
+	/**
+	 * 根据id查找指定的用户
+	 * @param id
+	 * @return
+	 */
+	public static User findUserById(String id){
+		return users.get(id);
+	}
+}
+
+
+3。创建RegisterServlet2，
+输出提示：注册成功,获取上面的所有信息，封装到user对象中，保存到UserDao 的users中，并将用户信息输出到浏览器。
+
+4.登录，创建LoginServlet2,login2.html,获取用户名与密码，跟UserDao中的users中的数据进行比较，能匹配就提示登录成功
+并转发到主页显示用户的所有信息，失败就重定向到login2.html。
