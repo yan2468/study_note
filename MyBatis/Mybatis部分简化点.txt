@@ -1,0 +1,15 @@
+简化：
+1.创建一个util包，将StudentDaoImpl的部分代码封装放进去。
+2.新增一个名为jdbc.properties的配置文件，将配置信息放进去，简化mybatis-config.xml的代码
+3.取别名   -- 将StudentMapper.XML映射文件里的resultType（实体类的路径） 提出来，在mybatis-config.xml里面创一个typeAliases标签然后放进去。
+4.自动取别名
+
+接口
+映射
+实现
+测试类（面向接口后就无测试类了）
+
+三一致
+接口方法名
+映射文件id名
+实现类方法名
